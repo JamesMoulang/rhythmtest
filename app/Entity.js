@@ -1,16 +1,16 @@
 import Vector from './Vector';
 
 class Entity {
-	constructor(position) {
+	constructor(position = new Vector(0, 0)) {
 		this.position = position;
 	}
 
-	update() {
+	update(delta) {
 
 	}
 
-	render() {
-
+	render(canvas, ctx, camera) {
+		
 	}
 }
 
