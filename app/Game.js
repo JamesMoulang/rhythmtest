@@ -164,9 +164,8 @@ class Game {
 	start() {
 		this.lastTimestamp = this.timestamp();
 
-		this.worker = RhythmWorkerGenerator();
+		this.worker = RhythmWorkerGenerator(2000, 16);
 
-		this.counter = 0;
 		this.worker.onmessage = function(event) {
 			var type = event.data.type;
 			var data = event.data.data;
@@ -174,22 +173,22 @@ class Game {
 				switch(data) {
 					case 'started':
 						console.log("STARTED!");
-						this.worker.postMessage({type: 'queue', data: 'test'});
+						this.worker.postMessage(
+							{
+								type: 'queue', 
+								data: {
+									beats: [0,4,8,10,12],
+									loop: true,
+									beat: 'tick',
+									listen: false
+								}
+							}
+						);
 						break;
 					case 'beat':
-						this.counter++;
-
-						if (this.counter == 2) {
-							var m = new MetronomeMarker(0.1);
-							this.entities.push(m);
-						}
-
-						if (this.counter == 4) {
-							Audio.play('tick');
-							var m = new MetronomeMarker();
-							this.entities.push(m);
-							this.counter = 0;
-						}
+						Audio.play('tick');
+						var m = new MetronomeMarker();
+						this.entities.push(m);
 						break;
 					default:
 
@@ -219,11 +218,13 @@ class Game {
 		if (this.input.p.clicked) {
 			var m = new InputMarker('#ff0000');
 			this.entities.push(m);
+			this.worker.postMessage({type: 'input', data: 'p'});
 		}
 
 		if (this.input.q.clicked) {
 			var m = new InputMarker('#0000ff');
 			this.entities.push(m);
+			this.worker.postMessage({type: 'input', data: 'q'});
 		}
 
 		_.each(this.entities, function(entity) {
